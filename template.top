@@ -1,0 +1,11 @@
+#include "../martini_v2.2.itp"
+#include "../ions.itp"
+#include "PEPTIDE.itp"
+
+[ system ]
+PEPTIDE in water, coarse grained.
+
+[ molecules ]
+W   N_WATER
+PEPTIDE  N_MOLECULES
+

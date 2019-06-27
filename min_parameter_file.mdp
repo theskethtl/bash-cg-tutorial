@@ -1,0 +1,126 @@
+; This run parameter file was originally taken from Gary's emulsions tutorial.
+; The original file was based on an out of date file and was not compatible with
+; GROMACS 5.X.
+;
+; Parameter reference: http://manual.gromacs.org/online/mdp_opt.html
+;
+; These parameters have been adapted from the sample parameter file given on the 
+; MARTINI site: 
+;   http://cgmartini.nl/images/parameters/exampleMDP/martini_v2.x_new.mdp
+
+; -------------------------------- RUN OPTIONS -------------------------------------
+; Use 'steep' integrator for minimisation, 'md' for equilibriation.
+integrator               = steep
+
+; Start time and timestep (in picoseconds - NOT femtoseconds)
+tinit                    = 0.0  ; Explicitly stated, but doesn't need to be given.
+dt                       = 0.025  ; 25fs. Can be longer (recommendation is 0.03)
+; Typically 5000 for a water minimisation. 4000000 for md run: 100ns at 0.025 dt.
+nsteps                   = 5000
+
+; emtol allows minimisation to finish early. Irrelevant to equilibriation.
+emtol                    = 1000
+
+; Output frequency control.
+; Options for TRR files.
+; Output frequency for coords (x), velocities (v) and forces (f)
+; Typically want ~2500-5000 frames. If velocities or forces are required,
+; remember to change these.
+nstxout                  = 0
+nstvout                  = 0
+nstfout                  = 0
+
+; Options for XTC files.
+; Output frequency, precision and subset of atoms for XTC files. XTC files are
+; trajectory files which occupy less disk space than DCD/TRR file as coordinates 
+; are truncated to (usually) 3dp. These may be useful for long simulations. 
+nstxtcout                = 0
+xtc_precision            = 0
+xtc-grps                 =
+
+; Options for energies.
+; The following options refer to energies. Calculation of energy requires
+; global process communication - this can be a bottleneck.
+nstcalcenergy            = 100  ; Default 100
+nstlog                   = 1000  ; Default 1000
+nstenergy                = 1000  ; Default 1000
+; The groups written to the energy file. If energies are required,
+; remember to specify eg "protein"
+energygrps               = 
+; Options for center of mass motion removal. This is dependent on nstcalcenergy.
+nstcomm                  = 100 ; Number of steps for center of mass motion removal 
+comm-grps		         =     ; Groups considered. Default is the whole system.
+
+
+; ---------------------------- NEIGHBOUR SEARCHING --------------------------------
+; This section is extensively changed from the original as the group 
+; neighbourlist scheme is deprecated in GROMACS 5.
+;
+; These parameters were supplied by MARTINI.
+
+cutoff-scheme            = Verlet
+nstlist                  = 20
+ns_type                  = grid
+pbc                      = xyz 
+verlet-buffer-tolerance  = 0.005
+ 
+coulombtype              = cutoff
+coulomb-modifier         = Potential-shift-verlet
+rcoulomb                 = 1.1
+epsilon_r                = 15
+vdw_type                 = cutoff
+rvdw                     = 1.1
+
+; ---------------------- TEMPERATURE / PRESSURE COUPLING --------------------------
+; Gary's original parameter file specified the Berendsen thermostat and barostat.
+; The orignal parameters are commented out for continuity. 
+; 
+; The Berendsen thermostat is said to be "less suited since it does not give a 
+; well described thermodynamic ensemble".
+; The official recommendation is to use the velocity-rescale thermostat with a 
+; coupling constant around 0.5-1 ps. 
+; 
+; The MARTINI-supplied parameter file uses the Parrinello-Rahman barostat with 
+; coupling constant 12ps. This is said to be prone to oscillating behaviour, and 
+; as these parameters are primarily used for equilibriation purposes the Berendsen
+; barostat continues to be used.
+
+; Gary's original parameters:
+; >    tcoupl                   = berendsen
+; >    tau_t                    = 0.1 0.1  
+; >    tc-grps                  = protein non-protein
+; >    ref_t                    = 303 303  
+; >    Pcoupl                   = berendsen  
+; >    Pcoupltype               = isotropic
+; >    tau_p                    = 3.0 3.0  
+; >    compressibility          = 4.6e-3 4.6e-3 
+; >    ref_p                    = 1.0 1.0 
+tcoupl                   = no  ; Should be 'v-rescale' for equilibriation
+tau_t                    = 
+tc-grps                  = 
+ref_t                    = 
+
+Pcoupl                   = no  ; Should be 'berendsen' for equilibriation
+Pcoupltype               = isotropic
+tau_p                    = 5.0
+compressibility          = 3e-4
+ref_p                    = 1.0
+
+; Velocity generation - unchanged from Gary's script. 
+gen_vel                  = no
+gen_temp                 = 303
+gen_seed                 = 474529
+
+; ------------------------------- BOND OPTIONS -----------------------------------
+; BONDS OPTIONS
+; MARTINI - for ring systems constraints are defined which are best 
+; handled using Lincs. 
+; Gary's script also contained these additional lines which are no
+; longer in the sample parameter file:
+; >    unconstrained_start      = no
+; >    lincs_order              = 4
+; >    lincs_warnangle          = 30
+
+constraints              = none 
+constraint_algorithm     = Lincs
+
