@@ -3,10 +3,6 @@
 # This script is the basic version of the dipeptide re-submission script.
 # The comments in this file should help you to understand what every line does.
 
-# Loading configuration variables, such as the water box and the number
-# of molecules.
-source ./configuration_dipeptides.sh
-
 # Loading the VMD and GROMACS modules. We need these for the simulation setup.
 module load vmd/1.9.1
 module load gromacs/intel-2018.2/2016.5-single

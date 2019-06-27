@@ -1,21 +1,21 @@
-#!/bin/bash
+##!/bin/bash
 # Written by Travis Hesketh, 2019. (C) TuttleLab, University of Strathclyde.
 # This script is the basic version of the dipeptide submission script.
 # The comments in this file should help you to understand what every line does.
 
 # To adapt this file for tripeptides/tetrapeptides etc.:
-#	Add additional for loops for each extra acid [after line 43] and acid definitions [line 47]
-#		- e.g. for INDEX_THREE in $(seq 0 ${NUM_ACIDS}); do [line 43] and ACID_THREE=${ACID_CODES[${INDEX_THREE}]} [line 47]
-#		- Remember to add additional 'done' statements [before line 133] for each new loop.
+#	Add additional for loops for each extra acid [after line 37] and acid definitions [line 41]
+#		- e.g. for INDEX_THREE in $(seq 0 ${NUM_ACIDS}); do [line 37] and ACID_THREE=${ACID_CODES[${INDEX_THREE}]} [line 41]
+#		- Remember to add additional 'done' statements [before line 132] for each new loop.
 #		- It is helpful for troubleshooting to indent lines to match the new logic levels.
-#	Change the definition of PEPTIDE to include your new acids. [line 51]
+#	Change the definition of PEPTIDE to include your new acids. [line 46]
 #		- For longer peptides we can use one letter codes instead of three letter codes
 #		  (WF, NA and CL all clash with reserved MARTINI names)
 #	Alter WX.pdb to have backbone atoms for your new acids.
 #		- There are templates for tri and tetrapeptides in the dropbox (WXY.pdb, WXYZ.pdb)
-#	Adjust the sed statement [line 67] to account for your new acids and template.
+#	Adjust the sed statement [line 66] to account for your new acids and template.
 #		- e.g. sed "s/WWW/${ACID_ONE}/g; s/XXX/${ACID_TWO}/g; s/YYY/${ACID_THREE}/g" ../WXY.pdb > ${PEPTIDE}_aa.pdb
-#	Update the secondard strucure in the martinize.py call [line 68] to contain extra E characters for each acid (e.g. -ss EEE)
+#	Update the secondard strucure in the martinize.py call [line 77] to contain extra E characters for each acid (e.g. -ss EEE)
 #	Remember to update the resubmission script and AP calculation scripts.
 
 # Loading the VMD and GROMACS modules. We need these for the simulation setup.
@@ -25,10 +25,8 @@ module load gromacs/intel-2018.2/2016.5-single
 # The amino acids we're interested in. Usually the full set. We use HSE instead of HIS
 # because this is how histidine is represented in the CHARMM forcefield.
 # If you're interested in generating a subset of dipeptides, you could define multiple arrays here.
-#ACID_CODES=(ALA CYS GLY HSE ILE LEU MET ASN PRO GLN SER THR VAL ASP GLU LYS ARG PHE TRP TYR)
-#ONE_LETTER_CODES=(A C G H I L M N P Q S T V D E K R F W Y)
-ACID_CODES=(ALA)
-ONE_LETTER_CODES=(A)
+ACID_CODES=(ALA CYS GLY HSE ILE LEU MET ASN PRO GLN SER THR VAL ASP GLU LYS ARG PHE TRP TYR)
+ONE_LETTER_CODES=(A C G H I L M N P Q S T V D E K R F W Y)
 
 # These 'for' loops go through all the items in the array above. Because we're "nesting" them,
 # the second loop goes through the whole loop each time the first goes round. In other words,
@@ -46,6 +44,11 @@ for INDEX_ONE in $(seq 0 ${NUM_ACIDS}); do
 		ACID_TWO_OLC=${ONE_LETTER_CODES[${INDEX_TWO}]}
 
 		PEPTIDE=${ACID_ONE}-${ACID_TWO}  # For tri/tetrapeptides, use PEPTIDE=${ACID_ONE_OLC}${ACID_TWO_OLC}${ACID_THREE_OLC} etc.
+
+		# If the peptide directory already exists, ignore it. This isn't the resubmission script.
+		if [ -d ${PEPTIDE} ]; then
+			continue
+		fi
 
 		# Making a directory called the name of our peptide, and moving into it. This is to keep all
 		# the files relevant to each system separated.
