@@ -8,4 +8,4 @@
 #SBATCH --ntasks=16
 module purge
 module load gromacs/intel-2018.2/2016.5-single-wee-archie
-mpirun -np ${SLURM_NTASKS} gmx_mpi mdrun -ntomp 1 -deffnm PEPTIDE_eq
+mpirun -np ${SLURM_NTASKS} gmx_mpi mdrun -s PEPTIDE_eq.tpr -ntomp 1 -deffnm PEPTIDE_eq
